@@ -2,7 +2,19 @@ import { createRemoteJWKSet, jwtVerify, type JWTPayload } from 'jose';
 
 import { ssoConfig } from './sso-config';
 
-const remoteJwks = createRemoteJWKSet(new URL(ssoConfig.jwksUri));
+let remoteJwks: ReturnType<typeof createRemoteJWKSet> | null = null;
+
+function getRemoteJwks(): ReturnType<typeof createRemoteJWKSet> {
+  if (!remoteJwks) {
+    if (!ssoConfig.jwksUri) {
+      throw new Error('KEYCLOAK_URL or KEYCLOAK_JWKS_URI is required to verify SSO tokens.');
+    }
+
+    remoteJwks = createRemoteJWKSet(new URL(ssoConfig.jwksUri));
+  }
+
+  return remoteJwks;
+}
 
 export interface VerifiedSsoToken extends JWTPayload {
   email?: string;
@@ -20,7 +32,7 @@ function extractRoles(payload: VerifiedSsoToken): string[] {
 }
 
 export async function verifySsoAccessToken(token: string): Promise<VerifiedSsoToken> {
-  const { payload } = await jwtVerify(token, remoteJwks, {
+  const { payload } = await jwtVerify(token, getRemoteJwks(), {
     issuer: ssoConfig.issuer,
     audience: ssoConfig.audience,
     algorithms: ['RS256'],
