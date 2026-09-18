@@ -3,6 +3,7 @@
 // silently sending users to a third-party identity provider. Do not re-enable:
 // a single missing env var would send authorization requests off-domain again.
 // const DEFAULT_KEYCLOAK_URL = 'https://iom-sso.kirisame.jp.net';
+const DEFAULT_KEYCLOAK_URL = 'https://sso-ng.iom-itb.id';
 const DEFAULT_KEYCLOAK_REALM = 'iom-itb-sso';
 const DEFAULT_ALLOWED_ROLES = ['admin', 'pengurus-bidang-1'];
 export const SSO_SESSION_COOKIE = 'iom_sso_access_token';
