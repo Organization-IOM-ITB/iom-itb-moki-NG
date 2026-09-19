@@ -9,6 +9,7 @@ const PUBLIC_PATH_PREFIXES = [
   '/silent-check-sso.html',
   '/api/auth/session',
   '/api/auth/logout',
+  '/api/sso/config',
   '/api/internal/scheduled-blasts/run-due',
   '/api/v1/messages/whatsapp',
   '/sso/login',
