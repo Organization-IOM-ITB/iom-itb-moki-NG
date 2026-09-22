@@ -10,18 +10,53 @@ interface ThemeRegistryProps {
   children: ReactNode;
 }
 
+// Palet & tipografi mengikuti app/iom-tokens.css (sumber kebenaran bersama
+// untuk semua UI IOM-ITB). Sebelumnya tema ini sama sekali tidak punya
+// palette, sehingga seluruh komponen MUI tampil memakai biru bawaan
+// (#1976d2) dan bukan biru IOM.
 const adminTheme = createTheme({
+  palette: {
+    primary: {
+      main: '#003793',
+      dark: '#002B73',
+      contrastText: '#FFFFFF',
+    },
+    secondary: {
+      main: '#EA8389',
+      dark: '#BF4B52',
+      contrastText: '#FFFFFF',
+    },
+    success: { main: '#0F9D58' },
+    error: { main: '#EF4444' },
+    warning: { main: '#F59E0B' },
+    background: {
+      default: '#F8FAFC',
+      paper: '#FFFFFF',
+    },
+    text: {
+      primary: '#0F172A',
+      secondary: '#64748B',
+    },
+    divider: '#E2E8F0',
+  },
+  shape: {
+    borderRadius: 8,
+  },
   typography: {
-    fontFamily: 'var(--font-geist-sans), sans-serif',
-    fontWeightMedium: 700,
-    fontWeightBold: 800,
+    fontFamily: 'var(--font-dm-sans), sans-serif',
+    fontWeightMedium: 600,
+    fontWeightBold: 700,
+    h1: { fontWeight: 600, letterSpacing: '-0.011em' },
+    h2: { fontWeight: 600, letterSpacing: '-0.008em' },
+    h3: { fontWeight: 600, letterSpacing: '-0.008em' },
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
           textTransform: 'none',
-          fontWeight: 700,
+          fontWeight: 600,
+          borderRadius: 8,
         },
       },
     },

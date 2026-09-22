@@ -1,0 +1,96 @@
+/* ============================================================
+   IOM-ITB Design Tokens — SATU SUMBER KEBENARAN
+   ------------------------------------------------------------
+   File ini disalin apa adanya ke tiap repo UI. Jangan mengubah
+   nilai hanya di satu repo: ubah di sini, lalu sinkronkan.
+
+   Kanal RGB (--*-rgb) disediakan agar Tailwind bisa memakai
+   modifier opacity (mis. bg-primary/50) lewat pola
+   rgb(var(--x) / <alpha-value>). Varian siap-pakai (--iom-*)
+   untuk CSS biasa.
+   ============================================================ */
+
+:root {
+  /* ---------- Brand ---------- */
+  --iom-primary-rgb: 0 55 147; /* #003793 — biru IOM */
+  --iom-primary-hover-rgb: 0 43 115; /* #002B73 */
+  --iom-primary-deep-rgb: 0 58 110; /* #003A6E — footer/teks gelap */
+  --iom-accent-rgb: 234 131 137; /* #EA8389 — aksen rose IOM */
+  --iom-accent-dark-rgb: 191 75 82; /* #BF4B52 */
+
+  /* ---------- Permukaan ---------- */
+  --iom-bg-rgb: 248 250 252; /* #F8FAFC — latar halaman */
+  --iom-surface-rgb: 255 255 255; /* #FFFFFF — kartu/panel */
+  --iom-surface-subtle-rgb: 242 247 252; /* #F2F7FC — blok bernuansa brand */
+  --iom-surface-muted-rgb: 241 245 249; /* #F1F5F9 — blok netral */
+
+  /* ---------- Teks ---------- */
+  --iom-fg-rgb: 15 23 42; /* #0F172A — judul */
+  --iom-text-rgb: 76 76 76; /* #4C4C4C — teks isi */
+  --iom-ink-rgb: 49 53 57; /* #313539 — teks pekat */
+  --iom-muted-fg-rgb: 100 116 139; /* #64748B — teks sekunder */
+  --iom-placeholder-rgb: 148 163 184; /* #94A3B8 */
+
+  /* Tint brand: menggantikan ~16 biru pucat nyaris identik yang
+     sebelumnya ditulis manual (#F3F7FF, #FAFCFF, #F6F8FF, dst). */
+  --iom-surface-brand-rgb: 232 238 255; /* #E8EEFF — isian bernuansa brand */
+
+  /* ---------- Garis ---------- */
+  --iom-border-rgb: 226 232 240; /* #E2E8F0 */
+  --iom-border-brand-rgb: 231 236 248; /* #E7ECF8 — garis bernuansa brand */
+  --iom-control-border-rgb: 140 140 148; /* border input */
+
+  /* ---------- Status ---------- */
+  --iom-success-rgb: 15 157 88; /* #0F9D58 */
+  --iom-danger-rgb: 239 68 68; /* #EF4444 */
+  --iom-danger-strong-rgb: 153 27 27; /* #991B1B — teks error di atas tint merah */
+  --iom-warning-rgb: 245 158 11; /* #F59E0B */
+
+  /* ---------- Siap pakai di CSS biasa ---------- */
+  --iom-primary: rgb(var(--iom-primary-rgb));
+  --iom-primary-hover: rgb(var(--iom-primary-hover-rgb));
+  --iom-primary-deep: rgb(var(--iom-primary-deep-rgb));
+  --iom-accent: rgb(var(--iom-accent-rgb));
+  --iom-accent-dark: rgb(var(--iom-accent-dark-rgb));
+  --iom-bg: rgb(var(--iom-bg-rgb));
+  --iom-surface: rgb(var(--iom-surface-rgb));
+  --iom-surface-subtle: rgb(var(--iom-surface-subtle-rgb));
+  --iom-surface-muted: rgb(var(--iom-surface-muted-rgb));
+  --iom-surface-brand: rgb(var(--iom-surface-brand-rgb));
+  --iom-fg: rgb(var(--iom-fg-rgb));
+  --iom-text: rgb(var(--iom-text-rgb));
+  --iom-ink: rgb(var(--iom-ink-rgb));
+  --iom-muted-fg: rgb(var(--iom-muted-fg-rgb));
+  --iom-placeholder: rgb(var(--iom-placeholder-rgb));
+  --iom-border: rgb(var(--iom-border-rgb));
+  --iom-border-brand: rgb(var(--iom-border-brand-rgb));
+  --iom-control-border: rgb(var(--iom-control-border-rgb));
+  --iom-success: rgb(var(--iom-success-rgb));
+  --iom-danger: rgb(var(--iom-danger-rgb));
+  --iom-danger-strong: rgb(var(--iom-danger-strong-rgb));
+  --iom-warning: rgb(var(--iom-warning-rgb));
+
+  /* ---------- Bentuk ---------- */
+  --iom-radius: 0.5rem;
+  --iom-radius-sm: 0.25rem;
+  --iom-radius-lg: 0.75rem;
+  --iom-radius-xl: 1rem;
+
+  /* ---------- Tipografi ---------- */
+  /* DM Sans dipilih sebagai font kanonik: sudah jadi wajah publik
+     iom-itb.id, jadi identitas yang dilihat donatur tidak berubah. */
+  --iom-font-sans: "DM Sans", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --iom-font-heading: var(--iom-font-sans);
+  --iom-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    monospace;
+
+  --iom-weight-normal: 400;
+  --iom-weight-medium: 500;
+  --iom-weight-semibold: 600;
+  --iom-weight-bold: 700;
+
+  --iom-leading-tight: 1.25;
+  --iom-leading-normal: 1.5;
+  --iom-leading-relaxed: 1.625;
+}

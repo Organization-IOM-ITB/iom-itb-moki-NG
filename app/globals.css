@@ -1,20 +1,37 @@
+@import "./iom-tokens.css";
 @import "tailwindcss";
 
+/* Sebelumnya moki memakai palet sendiri (krem #fdfcf8 + hijau tua #163020)
+   yang tidak berhubungan dengan brand IOM-ITB. Kini mengikuti
+   iom-tokens.css seperti UI IOM lainnya. */
 :root {
-  --background: #fdfcf8;
-  --foreground: #163020;
+  --background: var(--iom-bg);
+  --foreground: var(--iom-fg);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: var(--iom-primary);
+  --color-accent: var(--iom-accent);
+  --color-surface: var(--iom-surface);
+  --color-border: var(--iom-border);
+  --font-sans: var(--iom-font-sans);
+  --font-mono: var(--iom-font-mono);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), sans-serif;
-  line-height: 1.5;
+  font-family: var(--iom-font-sans);
+  line-height: var(--iom-leading-normal);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--iom-font-heading);
+  color: var(--iom-fg);
+  font-weight: var(--iom-weight-semibold);
+  letter-spacing: -0.008em;
 }
