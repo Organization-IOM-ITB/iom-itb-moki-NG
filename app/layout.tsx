@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import AdminNotificationCenter from "./components/AdminNotificationCenter";
 import DownloadProvider from "./components/DownloadProvider";
 import OutboundTrackerOverlay from "./components/OutboundTrackerOverlay";
@@ -7,9 +7,8 @@ import ThemeRegistry from "./components/ThemeRegistry";
 import SsoProvider from "./components/SsoProvider";
 import "./globals.css";
 
-// DM Sans = font kanonik IOM-ITB (lihat iom-tokens.css).
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
+const geistSans = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
@@ -31,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body
-        className={`${dmSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeRegistry>
           <SsoProvider>
