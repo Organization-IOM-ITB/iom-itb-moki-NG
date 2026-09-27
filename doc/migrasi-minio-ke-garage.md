@@ -36,15 +36,23 @@ generik (`endpoint`, `region`, `forcePathStyle: true` secara default), dan
 ```bash
 docker save quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z | gzip > ~/minio-image-backup.tar.gz
 
-# Coolify menormalkan nama volume: compose menulis `minio_data`, tapi di
-# server namanya memakai tanda hubung (<project>_minio-data). Karena itu
-# pola grep-nya harus menerima keduanya.
-docker volume ls --format '{{.Name}}' | grep -i minio      # pastikan namanya
-VOL=$(docker volume ls --format '{{.Name}}' | grep -iE 'minio[-_]data' | head -1)
-echo "VOL=$VOL"                                            # JANGAN lanjut kalau kosong
+# Nama volume moki disebut EKSPLISIT. Ada dua volume minio-data di server
+# (moki dan BanKes-OTA-NG), jadi `grep … | head -1` bisa mengambil yang
+# salah dan mem-backup stack yang bukan targetnya.
+#
+# Catatan: Coolify menormalkan nama volume — compose menulis `minio_data`,
+# tapi di server namanya <project>_minio-data (tanda hubung).
+VOL=lqfd6mol8al4jiquvvyb4ot3_minio-data
+docker volume inspect "$VOL" >/dev/null || echo "VOLUME TIDAK ADA — cek: docker volume ls | grep -i minio"
 
-docker run --rm -v "$VOL":/data -v ~:/backup \
+# Direktori backup ditulis absolut, bukan `~`. Saat dijalankan sebagai root
+# dari /home/madzul, `~` mengembang ke /root sehingga file-nya seolah tidak
+# terbuat padahal ada di tempat lain.
+BACKUP_DIR=/root
+docker run --rm -v "$VOL":/data -v "$BACKUP_DIR":/backup \
   alpine tar czf /backup/moki-minio-data-backup.tar.gz -C /data .
+
+ls -lh "$BACKUP_DIR/moki-minio-data-backup.tar.gz"   # pastikan ukurannya wajar
 ```
 
 ## 1. Env di Coolify
@@ -128,7 +136,7 @@ sementara dari image yang masih ada di cache.
 ```bash
 GC=$(docker ps --format '{{.Names}}' | grep ^garage- | head -1)
 NET=$(docker inspect "$GC" -f '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}' | tr ' ' '\n' | grep -v '^$' | head -1)
-VOL=$(docker volume ls --format '{{.Name}}' | grep -iE 'minio[-_]data' | head -1)
+VOL=lqfd6mol8al4jiquvvyb4ot3_minio-data
 
 docker run -d --name minio-old --network "$NET" \
   -v "$VOL":/data \
