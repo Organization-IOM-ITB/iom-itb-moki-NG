@@ -36,7 +36,13 @@ generik (`endpoint`, `region`, `forcePathStyle: true` secara default), dan
 ```bash
 docker save quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z | gzip > ~/minio-image-backup.tar.gz
 
-VOL=$(docker volume ls --format '{{.Name}}' | grep minio_data | head -1)
+# Coolify menormalkan nama volume: compose menulis `minio_data`, tapi di
+# server namanya memakai tanda hubung (<project>_minio-data). Karena itu
+# pola grep-nya harus menerima keduanya.
+docker volume ls --format '{{.Name}}' | grep -i minio      # pastikan namanya
+VOL=$(docker volume ls --format '{{.Name}}' | grep -iE 'minio[-_]data' | head -1)
+echo "VOL=$VOL"                                            # JANGAN lanjut kalau kosong
+
 docker run --rm -v "$VOL":/data -v ~:/backup \
   alpine tar czf /backup/moki-minio-data-backup.tar.gz -C /data .
 ```
@@ -57,6 +63,16 @@ container** (sama seperti sebelumnya dengan MinIO).
 
 `S3_ACCESS_KEY_ID` dan `S3_SECRET_ACCESS_KEY` diisi setelah langkah 3.
 `S3_REGION` tidak perlu diubah (`us-east-1` sudah cocok).
+
+## 1b. Pastikan tidak ada file storage sisa di Coolify
+
+Kalau pernah mencoba bind mount `garage.toml`, Coolify mendaftarkan
+`/etc/garage.toml` sebagai **file storage** dan bisa me-mount-nya sebagai
+directory kosong — menimpa config yang sudah di-COPY ke image, dan Garage
+akan gagal dengan `Is a directory (os error 21)`.
+
+Periksa di Coolify → resource → **Storages**, dan hapus entri
+`/etc/garage.toml` kalau ada. (Ini terjadi di `BanKes-OTA-NG`.)
 
 ## 2. Deploy
 
@@ -90,7 +106,7 @@ $G key info moki-app --show-secret   # -> S3_ACCESS_KEY_ID / S3_SECRET_ACCESS_KE
 ```
 
 Sesuaikan `-c 100G` dengan kapasitas yang ingin dialokasikan; cek dulu
-ukuran data lama dengan `docker system df -v | grep minio_data`.
+ukuran data lama dengan `docker system df -v | grep -i minio`.
 
 ### ⚠️ Bucket dari database
 
@@ -112,7 +128,7 @@ sementara dari image yang masih ada di cache.
 ```bash
 GC=$(docker ps --format '{{.Names}}' | grep ^garage- | head -1)
 NET=$(docker inspect "$GC" -f '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}' | tr ' ' '\n' | grep -v '^$' | head -1)
-VOL=$(docker volume ls --format '{{.Name}}' | grep minio_data | head -1)
+VOL=$(docker volume ls --format '{{.Name}}' | grep -iE 'minio[-_]data' | head -1)
 
 docker run -d --name minio-old --network "$NET" \
   -v "$VOL":/data \
