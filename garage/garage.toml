@@ -1,0 +1,26 @@
+# Garage — object storage pengganti MinIO (lihat doc/migrasi-minio-ke-garage.md)
+#
+# Secret TIDAK ditaruh di sini: rpc_secret dan admin_token diisi lewat
+# environment variable GARAGE_RPC_SECRET dan GARAGE_ADMIN_TOKEN.
+
+metadata_dir = "/var/lib/garage/meta"
+data_dir     = "/var/lib/garage/data"
+
+db_engine = "lmdb"
+replication_factor = 1
+
+rpc_bind_addr   = "[::]:3901"
+rpc_public_addr = "127.0.0.1:3901"
+
+[s3_api]
+# "us-east-1" mencocokkan DEFAULT_REGION di app/lib/object-storage.ts,
+# sehingga tidak perlu S3_REGION khusus.
+s3_region     = "us-east-1"
+api_bind_addr = "[::]:3900"
+root_domain   = ".s3.garage.internal"
+
+# [s3_web] sengaja TIDAK dipakai. moki menyajikan file lewat presigned URL
+# dari S3 API, bukan lewat bucket publik — beda dengan BanKes-OTA-NG.
+
+[admin]
+api_bind_addr = "[::]:3903"

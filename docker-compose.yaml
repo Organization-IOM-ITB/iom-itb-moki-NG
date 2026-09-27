@@ -37,17 +37,32 @@ services:
       start_period: 5s
     restart: unless-stopped
 
-  minio:
-    image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
-    command: server /data --console-address ":9001"
+  garage:
+    # Pengganti MinIO: MinIO menutup distribusi publik image maupun binary-nya
+    # (lihat doc/migrasi-minio-ke-garage.md). Garage S3-compatible, AGPL, dan
+    # image-nya bisa di-pull serta di-pin.
+    #
+    # Config lewat build (COPY), bukan bind mount — bind mount file repo tidak
+    # bisa dipakai di Coolify; alasannya ada di garage/Dockerfile.
+    build:
+      context: ./garage
+      dockerfile: Dockerfile
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin123}
+      GARAGE_RPC_SECRET: ${GARAGE_RPC_SECRET}
+      GARAGE_ADMIN_TOKEN: ${GARAGE_ADMIN_TOKEN}
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      # S3 API di-publish karena presigned URL memakai host dari S3_ENDPOINT
+      # apa adanya (tanpa rewrite), jadi endpoint-nya harus bisa dijangkau
+      # browser. Port 3900 menggantikan 9000 milik MinIO — S3_ENDPOINT_DOCKER
+      # harus diubah port-nya.
+      - "3900:3900"
     volumes:
-      - minio_data:/data
+      - garage_meta:/var/lib/garage/meta
+      - garage_data:/var/lib/garage/data
+    # TANPA healthcheck: Garage perlu bootstrap layout manual sekali, dan
+    # sebelum itu `garage status` membalas non-zero. Kalau dipakai sebagai
+    # healthcheck lalu digandeng service_healthy, deploy tidak akan pernah
+    # selesai sehingga bootstrap-nya sendiri mustahil dikerjakan.
     restart: unless-stopped
 
   web:
@@ -76,7 +91,7 @@ services:
     environment:
       DATABASE_URL: ${DATABASE_URL_DOCKER:-postgresql://iom4:iom4_password@postgres:5432/iom4}
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
-      S3_ENDPOINT: ${S3_ENDPOINT_DOCKER:-http://minio:9000}
+      S3_ENDPOINT: ${S3_ENDPOINT_DOCKER:-http://garage:3900}
       WHATSAPP_ORCHESTRATOR_ENABLED: ${WHATSAPP_ORCHESTRATOR_ENABLED:-false}
       WHATSAPP_ORCHESTRATOR_BASE_URL: ${WHATSAPP_ORCHESTRATOR_BASE_URL:-http://orchestrator:3099}
       # SSO settings are needed by the running server, not just by the build.
@@ -100,7 +115,7 @@ services:
         condition: service_healthy
       postgres:
         condition: service_healthy
-      minio:
+      garage:
         condition: service_started
     restart: unless-stopped
     volumes:
@@ -123,7 +138,7 @@ services:
     environment:
       DATABASE_URL: ${DATABASE_URL_DOCKER:-postgresql://iom4:iom4_password@postgres:5432/iom4}
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
-      S3_ENDPOINT: ${S3_ENDPOINT_DOCKER:-http://minio:9000}
+      S3_ENDPOINT: ${S3_ENDPOINT_DOCKER:-http://garage:3900}
       WHATSAPP_CHROMIUM_PATH: /usr/bin/chromium
     volumes:
       - bot_auth:/app/.wwebjs_auth
@@ -144,7 +159,7 @@ services:
     environment:
       DATABASE_URL: ${DATABASE_URL_DOCKER:-postgresql://iom4:iom4_password@postgres:5432/iom4}
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
-      S3_ENDPOINT: ${S3_ENDPOINT_DOCKER:-http://minio:9000}
+      S3_ENDPOINT: ${S3_ENDPOINT_DOCKER:-http://garage:3900}
       WHATSAPP_ORCHESTRATOR_PORT: 3099
       WHATSAPP_ORCHESTRATOR_MAX_CONTAINERS: ${WHATSAPP_ORCHESTRATOR_MAX_CONTAINERS:-3}
       WHATSAPP_ORCHESTRATOR_START_COOLDOWN_MS: ${WHATSAPP_ORCHESTRATOR_START_COOLDOWN_MS:-30000}
@@ -163,7 +178,8 @@ services:
 
 volumes:
   bot_auth:
-  minio_data:
+  garage_meta:
+  garage_data:
   postgres_data:
   redis_data:
   web_cache:
