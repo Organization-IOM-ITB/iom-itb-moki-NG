@@ -15,6 +15,7 @@ import LocalOfferRoundedIcon from "@mui/icons-material/LocalOfferRounded";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 
 import { adminPalette, adminTypographySx } from "../lib/adminPalette";
+import AppSelectorFab from "./AppSelectorFab";
 import { useSso } from "./SsoProvider";
 
 interface AdminFeatureShellProps {
@@ -465,6 +466,8 @@ export default function AdminFeatureShell({
           </Box>
         </Stack>
       </Box>
+
+      <AppSelectorFab />
     </Box>
   );
 }
