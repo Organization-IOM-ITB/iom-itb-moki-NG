@@ -50,12 +50,16 @@ services:
     environment:
       GARAGE_RPC_SECRET: ${GARAGE_RPC_SECRET}
       GARAGE_ADMIN_TOKEN: ${GARAGE_ADMIN_TOKEN}
-    ports:
-      # S3 API di-publish karena presigned URL memakai host dari S3_ENDPOINT
-      # apa adanya (tanpa rewrite), jadi endpoint-nya harus bisa dijangkau
-      # browser. Port 3900 menggantikan 9000 milik MinIO — S3_ENDPOINT_DOCKER
-      # harus diubah port-nya.
-      - "3900:3900"
+    # TIDAK mem-publish port. S3_ENDPOINT_DOCKER bernilai internal
+    # (http://garage:3900), sama seperti http://minio:9000 sebelumnya, jadi
+    # S3 API hanya diakses dari dalam network compose. MinIO dulu mem-publish
+    # 9000/9001 tanpa kebutuhan itu.
+    #
+    # CATATAN: app/ticket/[id]/page.tsx merender <img src={media_signed_url}>
+    # langsung di browser, sehingga presigned URL dari endpoint internal TIDAK
+    # bisa dimuat. Ini bug yang sudah ada sejak memakai MinIO, bukan akibat
+    # migrasi. Perbaikan yang benar adalah route proxy server-side seperti
+    # /api/admin/content-assets/[assetId]/download — bukan mengekspos S3.
     volumes:
       - garage_meta:/var/lib/garage/meta
       - garage_data:/var/lib/garage/data

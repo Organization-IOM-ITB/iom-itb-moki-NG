@@ -64,10 +64,22 @@ openssl rand -base64 32 # -> GARAGE_ADMIN_TOKEN
 
 Tambahkan `GARAGE_RPC_SECRET` dan `GARAGE_ADMIN_TOKEN`.
 
-⚠️ **`S3_ENDPOINT_DOCKER` harus diubah port-nya dari `9000` ke `3900`.**
-Nilainya dipakai apa adanya sebagai host presigned URL — tanpa rewrite —
-jadi harus tetap berupa alamat yang bisa dijangkau **browser maupun
-container** (sama seperti sebelumnya dengan MinIO).
+⚠️ **`S3_ENDPOINT_DOCKER` diubah port-nya dari `9000` ke `3900`**, host
+tetap internal: `http://garage:3900` (sebelumnya `http://minio:9000`).
+
+S3 API **tidak** di-publish ke host — tidak diperlukan, karena diakses dari
+dalam network compose saja.
+
+> **Bug lama yang perlu diketahui, bukan akibat migrasi.**
+> `app/ticket/[id]/page.tsx` merender `<img src={media_signed_url}>`
+> langsung di browser. Presigned URL dibuat dari `S3_ENDPOINT`, yang
+> bernilai internal — dulu `minio:9000`, sekarang `garage:3900` — sehingga
+> browser tidak bisa me-resolve host-nya dan **lampiran media tiket tidak
+> tampil**. Ini sudah terjadi sejak memakai MinIO.
+>
+> Perbaikan yang benar: route proxy server-side, seperti
+> `/api/admin/content-assets/[assetId]/download` yang sudah ada untuk asset
+> konten — bukan mengekspos S3 API ke internet.
 
 `S3_ACCESS_KEY_ID` dan `S3_SECRET_ACCESS_KEY` diisi setelah langkah 3.
 `S3_REGION` tidak perlu diubah (`us-east-1` sudah cocok).
