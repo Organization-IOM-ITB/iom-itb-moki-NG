@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { Box, Button, Drawer, IconButton, Stack, Typography } from "@mui/material";
+import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
 import ConfirmationNumberRoundedIcon from "@mui/icons-material/ConfirmationNumberRounded";
 import Groups2RoundedIcon from "@mui/icons-material/Groups2Rounded";
 import NotificationsNoneRoundedIcon from "@mui/icons-material/NotificationsNoneRounded";
@@ -94,6 +96,121 @@ const NAV_ITEMS = [
   },
 ];
 
+interface NavItem {
+  href: string;
+  featureKey: string;
+  label: string;
+  icon: React.ReactNode;
+}
+
+// Isi rail (logo + menu). Dipakai di sidebar desktop (≥ lg) dan di drawer
+// yang dibuka tombol menu di header untuk layar lebih sempit.
+function SidebarRailContent({
+  navItems,
+  currentPath,
+  onNavigate,
+}: {
+  navItems: NavItem[];
+  currentPath: string;
+  onNavigate?: () => void;
+}) {
+  return (
+    <>
+      <Box
+        sx={{
+          width: "100%",
+          height: 60,
+          px: 1,
+          py: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#FFFFFF",
+          borderBottom: "1px solid rgba(255,255,255,0.08)",
+        }}
+      >
+        <Box
+          sx={{
+            width: 120,
+            height: 60,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#ffffff",
+            overflow: "hidden",
+          }}
+        >
+          <Box
+            component="img"
+            src="/logo copy.png"
+            alt="MOKI"
+            sx={{
+              maxWidth: "100%",
+              maxHeight: "100%",
+              objectFit: "contain",
+              display: "block",
+            }}
+          />
+        </Box>
+      </Box>
+
+      <Stack spacing={0} sx={{ width: "100%", py: 1 }}>
+        {navItems.map((item) => {
+          const active = item.href === currentPath;
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              style={{ textDecoration: "none" }}
+              onClick={onNavigate}
+            >
+              <Box
+                sx={{
+                  px: 0.5,
+                  py: 1.05,
+                  backgroundColor: active
+                    ? adminPalette.sidebarActive
+                    : "transparent",
+                  color: active
+                    ? adminPalette.textPrimary
+                    : adminPalette.sidebarRailText,
+                  textAlign: "center",
+                  transition:
+                    "background-color 120ms ease, color 120ms ease",
+                  "&:hover": {
+                    backgroundColor: active
+                      ? adminPalette.sidebarActive
+                      : "rgba(255,255,255,0.08)",
+                  },
+                  "& .MuiSvgIcon-root": {
+                    fontSize: 20,
+                  },
+                }}
+              >
+                <Box sx={{ display: "grid", placeItems: "center" }}>
+                  {item.icon}
+                </Box>
+                <Typography
+                  sx={{
+                    mt: 0.55,
+                    fontSize: "0.62rem",
+                    lineHeight: 1.15,
+                    fontWeight: 700,
+                    color: "inherit",
+                  }}
+                >
+                  {item.label}
+                </Typography>
+              </Box>
+            </Link>
+          );
+        })}
+      </Stack>
+    </>
+  );
+}
+
 export default function AdminFeatureShell({
   title,
   description,
@@ -103,6 +220,7 @@ export default function AdminFeatureShell({
   children,
 }: AdminFeatureShellProps) {
   const { userName, userEmail, roles, features, logout } = useSso();
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const isAdmin = roles.includes("admin");
   const accessibleNavItems = NAV_ITEMS.filter((item) => isAdmin || features.includes(item.featureKey));
   const navItems = isAdmin
@@ -145,96 +263,7 @@ export default function AdminFeatureShell({
             borderRight: "1px solid rgba(4, 1, 1, 0.08)",
           }}
         >
-          <Box
-            sx={{
-              width: "100%",
-              height: 60,
-              px: 1,
-              py: 1,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: "#FFFFFF",
-              borderBottom: "1px solid rgba(255,255,255,0.08)",
-            }}
-          >
-            <Box
-              sx={{
-                width: 120,
-                height: 60,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#ffffff",
-                overflow: "hidden",
-              }}
-            >
-              <Box
-                component="img"
-                src="/logo copy.png"
-                alt="MOKI"
-                sx={{
-                  maxWidth: "100%",
-                  maxHeight: "100%",
-                  objectFit: "contain",
-                  display: "block",
-                }}
-              />
-            </Box>
-          </Box>
-
-          <Stack spacing={0} sx={{ width: "100%", py: 1 }}>
-            {navItems.map((item) => {
-              const active = item.href === currentPath;
-
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  style={{ textDecoration: "none" }}
-                >
-                  <Box
-                    sx={{
-                      px: 0.5,
-                      py: 1.05,
-                      backgroundColor: active
-                        ? adminPalette.sidebarActive
-                        : "transparent",
-                      color: active
-                        ? adminPalette.textPrimary
-                        : adminPalette.sidebarRailText,
-                      textAlign: "center",
-                      transition:
-                        "background-color 120ms ease, color 120ms ease",
-                      "&:hover": {
-                        backgroundColor: active
-                          ? adminPalette.sidebarActive
-                          : "rgba(255,255,255,0.08)",
-                      },
-                      "& .MuiSvgIcon-root": {
-                        fontSize: 20,
-                      },
-                    }}
-                  >
-                    <Box sx={{ display: "grid", placeItems: "center" }}>
-                      {item.icon}
-                    </Box>
-                    <Typography
-                      sx={{
-                        mt: 0.55,
-                        fontSize: "0.62rem",
-                        lineHeight: 1.15,
-                        fontWeight: 700,
-                        color: "inherit",
-                      }}
-                    >
-                      {item.label}
-                    </Typography>
-                  </Box>
-                </Link>
-              );
-            })}
-          </Stack>
+          <SidebarRailContent navItems={navItems} currentPath={currentPath} />
         </Box>
 
         <Box
@@ -256,6 +285,18 @@ export default function AdminFeatureShell({
           }}
         >
           <Stack direction="row" spacing={1.2} alignItems="center">
+            <IconButton
+              aria-label="Buka menu"
+              onClick={() => setDrawerOpen(true)}
+              sx={{
+                display: { xs: "inline-flex", lg: "none" },
+                ml: -1,
+                color: "#ffffff",
+                "&:hover": { backgroundColor: "rgba(255,255,255,0.12)" },
+              }}
+            >
+              <MenuRoundedIcon />
+            </IconButton>
             <Typography
               sx={{
                 fontSize: "0.95rem",
@@ -466,6 +507,26 @@ export default function AdminFeatureShell({
           </Box>
         </Stack>
       </Box>
+
+      <Drawer
+        anchor="left"
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        sx={{ display: { lg: "none" } }}
+        PaperProps={{
+          sx: {
+            width: 80,
+            alignItems: "center",
+            backgroundColor: adminPalette.sidebarRail,
+          },
+        }}
+      >
+        <SidebarRailContent
+          navItems={navItems}
+          currentPath={currentPath}
+          onNavigate={() => setDrawerOpen(false)}
+        />
+      </Drawer>
 
       <AppSelectorFab />
     </Box>
