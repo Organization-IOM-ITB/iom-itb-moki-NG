@@ -146,6 +146,11 @@ services:
       WHATSAPP_CHROMIUM_PATH: /usr/bin/chromium
     volumes:
       - bot_auth:/app/.wwebjs_auth
+    # Chromium (whatsapp-web.js) pernah membengkak ke ±4,5 GB dan memicu OOM
+    # global di VPS (kern.log 2026-09-14 dan 2026-10-08). Batas ini mengurung
+    # OOM di container bot saja. Pemakaian normal ±450 MiB.
+    mem_limit: 2g
+    memswap_limit: 2g
     depends_on:
       redis:
         condition: service_healthy
